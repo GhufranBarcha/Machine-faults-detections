@@ -1,0 +1,4 @@
+joblib==1.4.2
+tensorflow==2.16.1
+openpyxl==3.0.10
+streamlit==1.29.0
