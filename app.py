@@ -80,7 +80,9 @@ if uploaded_file:
             data = pd.read_excel(uploaded_file)
 
         st.write("### Uploaded Data Preview:")
-        st.dataframe(data.head(), width=3000)  # Show a preview of the uploaded data
+        if "faults" in data.columns:
+          data1 = data.drop("faults",axis = 1)
+        st.dataframe(data1.head(), width=3000)  # Show a preview of the uploaded data
         
         # Select only relevant columns for prediction
         features = data[['Ia', 'Van', 'Vdc', 'Io', 'Ibat', 'Vbat', 'SOC', 'Temperature', 'Ia.1', 'Ib', 'Ic', 'Vsd']]
