@@ -33,5 +33,5 @@ To run the app locally, follow these steps:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-repo/fault-prediction-app
-   cd fault-prediction-app
+   git clone https://github.com/GhufranBarcha/Machine-faults-detections
+   cd Machine-faults-detections
