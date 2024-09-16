@@ -1,8 +1,11 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
+import plotly.io as pio
+pio.templates.default = "plotly"
 
 # Set the page configuration
 st.set_page_config(page_title="Fault Prediction App", page_icon="📊")
@@ -62,7 +65,8 @@ def predict(features):
         'Predicted Class': predicted_labels,
         'Probability': predicted_class_probabilities
     })
-
+    
+    
     return result_df
 
 # Streamlit app starts here
@@ -94,6 +98,17 @@ if uploaded_file:
         result = pd.concat([data, prediction_df], axis=1)
         st.write("### Prediction Results:")
         st.dataframe(result, width=3000)
+      
+        
+        
+        class_counts = prediction_df["Predicted Class"].value_counts()
+        # Create an interactive bar plot using Plotly
+        fig = px.bar(class_counts, x=class_counts.index, y=class_counts.values,
+                    labels={'x': 'Predicted Class', 'y': 'Faults'},
+                    title="Distribution of Predicted Classes")
+
+        # Show the plot in Streamlit
+        st.plotly_chart(fig)
         
     except Exception as e:
         st.error(f"Error: {e}")
