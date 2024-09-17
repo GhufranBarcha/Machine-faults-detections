@@ -66,8 +66,37 @@ def predict(features):
         'Probability': predicted_class_probabilities
     })
     
-    
     return result_df
+
+# Function to highlight corresponding fault values in red
+def highlight_faults(row):
+    fault = row['Predicted Class']
+    fault_columns = {
+        'GridFault_Van': 'Van',
+        "GridFault_Ia":"Ia",
+        'BatteryFault_Vbat': 'Vbat',
+        'BatteryFault_Ibat': 'Ibat',
+        'PowerControlFault_Ia': 'Ia',
+        'PowerControlFault_Vsd': 'Vsd',
+        'PowerControlFault_Ic': 'Ic',
+        'PowerControlFault_Ib': 'Ib',
+        'ConverterFault_Vdc': 'Vdc',
+        'ConverterFault_Io': 'Io',
+        "OverTemperatureFault":"Temperature",
+        
+        # Add more fault types and their corresponding columns as needed
+    }
+    
+    # Create a list to store styles
+    styles = ['' for _ in range(len(row))]
+
+    # If the fault type exists in our dictionary, highlight the corresponding column
+    if fault in fault_columns:
+        fault_column = fault_columns[fault]
+        if fault_column in row.index:
+            styles[row.index.get_loc(fault_column)] = 'background-color: red; color: white;'
+
+    return styles
 
 # Streamlit app starts here
 st.title('Fault Prediction App 📊')
@@ -85,8 +114,10 @@ if uploaded_file:
 
         st.write("### Uploaded Data Preview:")
         if "faults" in data.columns:
-          data1 = data.drop("faults",axis = 1)
-        st.dataframe(data1.head(), width=3000)  # Show a preview of the uploaded data
+            data1 = data.drop("faults", axis=1)
+            st.dataframe(data1.head(), width=3000)
+        else:  
+            st.dataframe(data.head(), width=3000)  # Show a preview of the uploaded data
         
         # Select only relevant columns for prediction
         features = data[['Ia', 'Van', 'Vdc', 'Io', 'Ibat', 'Vbat', 'SOC', 'Temperature', 'Ia.1', 'Ib', 'Ic', 'Vsd']]
@@ -96,20 +127,26 @@ if uploaded_file:
         
         # Show the combined original data and predictions
         result = pd.concat([data, prediction_df], axis=1)
-        st.write("### Prediction Results:")
-        st.dataframe(result, width=3000)
-      
-        
-        
-        class_counts = prediction_df["Predicted Class"].value_counts()
-        # Create an interactive bar plot using Plotly
-        fig = px.bar(class_counts, x=class_counts.index, y=class_counts.values,
-                    labels={'x': 'Predicted Class', 'y': 'Faults'},
-                    title="Distribution of Predicted Classes")
 
-        # Show the plot in Streamlit
-        st.plotly_chart(fig)
+        st.write("### Prediction Results:")
         
+        # Apply the custom highlight function
+        styled_result = result.style.apply(highlight_faults, axis=1)
+        
+        # Display the styled dataframe
+        st.dataframe(styled_result, width=3000)
+      
+        try:
+            class_counts = prediction_df["Predicted Class"].value_counts()
+            # Create an interactive bar plot using Plotly
+            fig = px.bar(class_counts, x=class_counts.index, y=class_counts.values,
+                        labels={'x': 'Predicted Class', 'y': 'Faults'},
+                        title="Distribution of Predicted Classes")
+
+            # Show the plot in Streamlit
+            st.plotly_chart(fig)
+        except Exception as e:
+            st.write("Only contain single class.")
     except Exception as e:
         st.error(f"Error: {e}")
 else:
