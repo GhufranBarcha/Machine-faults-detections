@@ -140,7 +140,7 @@ if uploaded_file:
             class_counts = prediction_df["Predicted Class"].value_counts()
             # Create an interactive bar plot using Plotly
             fig = px.bar(class_counts, x=class_counts.index, y=class_counts.values,
-                        labels={'x': 'Predicted Class', 'y': 'Faults'},
+                        labels={'x': 'Faults', 'y': 'Counts'},
                         title="Distribution of Predicted Classes")
 
             # Show the plot in Streamlit
